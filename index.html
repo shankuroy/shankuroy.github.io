@@ -1,20 +1,96 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="data:,">
-    <link rel="stylesheet" href="style.css">
-    <title>s h a n k u r o y</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>shankuroy</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body,
+    html {
+      background: #000;
+      overflow: hidden;
+    }
+
+    #stage {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      overflow: hidden;
+    }
+  </style>
 </head>
+
 <body>
-    <div class="wrapper">
-        <div class="smile">
-            <p>:)</p>
-        </div>
-        <div class="wink">
-            <p>;)</p>
-        </div>
-    </div>
+  <div id="stage">
+    <svg id="logo" style="position:absolute;top:0;left:0;overflow:visible;" viewBox="0 0 1058.4 465.84"
+      xmlns="http://www.w3.org/2000/svg">
+      <!-- svg adapted from https://commons.wikimedia.org/wiki/File:DVD_logo.svg -->
+      <path id="dvdpath"
+        d="m91.053 0-13.719 57.707 102.28 0.039063h24c65.747 0 105.91 26.44 94.746 73.4-12.147 51.133-69.613 73.4-130.67 73.4h-22.947l29.787-125.45h-102.27l-43.521 183.2h145.05c109.07 0 212.76-57.573 231.01-131.15 3.3467-13.507 2.8806-47.253-5.3594-67.359-0.21299-0.787-0.42594-1.4-1.1855-3-0.293-0.653-0.56012-3.6412 1.1465-4.2812 0.947-0.36 2.7069 1.4944 2.9336 2.041 0.853 2.24 1.5059 3.9062 1.5059 3.9062l92.293 260.6 234.97-265.21 99.535-0.089844h24c65.76 0 106.25 26.44 95.092 73.4-12.147 51.133-69.947 73.4-131 73.4h-22.959l29.799-125.47h-102.27l-43.533 183.21h145.07c109.05 0 213.48-57.4 231-131.15 17.52-73.75-59.107-131.15-168.69-131.15h-216.4s-57.319 67.88-67.959 80.693c-57.12 68.787-67.241 87.226-68.961 91.986 0.24-4.8-1.8138-23.412-26.174-92.959-6.48-18.52-27.359-79.721-27.359-79.721h-389.25zm408.77 324.16c-276.04 0-499.83 31.72-499.83 70.84s223.79 70.84 499.83 70.84c276.04 0 499.83-31.72 499.83-70.84s-223.79-70.84-499.83-70.84zm-18.094 48.627c63.04 0 114.13 10.573 114.13 23.613s-51.095 23.613-114.13 23.613c-63.027 0-114.13-10.573-114.13-23.613s51.106-23.613 114.13-23.613z"
+        fill="#e63946" />
+    </svg>
+  </div>
+  <script>
+    const CONFIG = {
+      sizePct: 20,  // logo height as % of shortest screen dimension
+      speed: 3  // pixels per frame
+    };
+
+    const SVG_ASPECT = 1058.4 / 465.84;
+    const COLORS = ['#e63946', '#f4a261', '#2a9d8f', '#4cc9f0', '#e76f51', '#a8dadc', '#c77dff', '#06d6a0', '#ffd166', '#ef476f'];
+
+    const logo = document.getElementById('logo');
+    const dvdpath = document.getElementById('dvdpath');
+
+    let x, y, vx, vy, logoW, logoH, colorIdx = 0;
+
+    function resize() {
+      const ref = Math.min(window.innerWidth, window.innerHeight);
+      logoH = ref * (CONFIG.sizePct / 100);
+      logoW = logoH * SVG_ASPECT;
+      logo.style.width = logoW + 'px';
+      logo.style.height = logoH + 'px';
+    }
+
+    function nextColor() {
+      const prev = colorIdx;
+      do { colorIdx = (colorIdx + 1) % COLORS.length; } while (colorIdx === prev);
+      dvdpath.style.fill = COLORS[colorIdx];
+    }
+
+    function tick() {
+      const maxX = window.innerWidth - logoW;
+      const maxY = window.innerHeight - logoH;
+
+      x += vx; y += vy;
+
+      let hitX = false, hitY = false;
+      if (x <= 0) { x = 0; vx = Math.abs(vx); hitX = true; }
+      if (x >= maxX) { x = maxX; vx = -Math.abs(vx); hitX = true; }
+      if (y <= 0) { y = 0; vy = Math.abs(vy); hitY = true; }
+      if (y >= maxY) { y = maxY; vy = -Math.abs(vy); hitY = true; }
+
+      if (hitX || hitY) nextColor();
+
+      logo.style.transform = `translate(${x}px,${y}px)`;
+      requestAnimationFrame(tick);
+    }
+
+    resize();
+    x = (window.innerWidth - logoW) / 2;
+    y = (window.innerHeight - logoH) / 2;
+    vx = CONFIG.speed;
+    vy = CONFIG.speed * 0.6;
+    window.addEventListener('resize', resize);
+    tick();
+  </script>
 </body>
+
 </html>
